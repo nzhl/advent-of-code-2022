@@ -3,6 +3,7 @@ pub mod day2;
 pub mod day3;
 pub mod day4;
 pub mod day5;
+pub mod day6;
 /* placeholder1 */
 
 
@@ -14,6 +15,7 @@ pub fn solve(num: u32) {
         3 => day3::solve(),
         4 => day4::solve(),
         5 => day5::solve(),
+        6 => day6::solve(),
         /* placeholder2 */
         
         _ => {
