@@ -4,6 +4,7 @@ use std::vec::Vec;
 use std::rc::Rc;
 use std::iter;
 
+const MAGIC_NUM: usize = 30000000 - (70000000 - 41111105);
 
 #[derive(Debug)]
 pub enum FsNode {
@@ -73,23 +74,26 @@ impl FsNode {
         }
     }
 
-    fn print(self: &Self, depth: usize) {
+    fn print(self: &Self, depth: usize, minimum: &mut usize) {
         let tabs = iter::repeat("  ").take(depth).collect::<String>();
         match self {
             FsNode::File { name, size } => {
                 println!("{}- {} (file, size={})", tabs, name, size);
             }
             FsNode::Dir { name, size, children } => {
+                if *size >= MAGIC_NUM && (*minimum == 0 || *size < *minimum) {
+                    *minimum = *size;
+                }
                 println!("{}- {} (dir, size={})", tabs, name, size);
                 for each in children {
-                    RefCell::borrow(each).print(depth + 1);
+                    RefCell::borrow(each).print(depth + 1, minimum);
                 }
             }
         }
     }
 }
 
-pub fn part1() {
+pub fn solve() {
     // build the tree
     let root = Rc::new(RefCell::new(FsNode::new(true, String::new(), 0)));
     let mut cwd_traces = vec![root.clone()];
@@ -130,10 +134,9 @@ pub fn part1() {
     root.borrow_mut().calc_size(100000, &mut sum);
 
     // print
-    root.borrow().print(0);
+    let mut minimum = 0;
+    root.borrow().print(0, &mut minimum);
     println!("sum {}", sum);
+    println!("minimum {}", minimum);
 }
 
-pub fn solve() {
-    part1();
-}
